@@ -1,0 +1,91 @@
+services:
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one:latest
+    init: true
+    restart: always
+    container_name: nextcloud-aio-mastercontainer # This line cannot be changed.
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nextcloud-aio
+    ports:
+      - 0.0.0.0:8080:8080
+    environment:
+      APACHE_PORT: 11000
+      APACHE_IP_BINDING: 127.0.0.1
+      SKIP_DOMAIN_VALIDATION: "true"
+      NEXTCLOUD_DATADIR: ${AIO_DATA_DIR}
+      NEXTCLOUD_MOUNT: ${AIO_MNT_DIR}
+
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    environment:
+      NC_DOMAIN: ${NC_DOMAIN} # Change this to your domain ending with .ts.net in the format {$TS_HOSTNAME}.{tailnetdomain}
+    volumes:
+      - type: bind
+        source: ./Caddyfile
+        target: /etc/caddy/Caddyfile
+      - type: volume
+        source: caddy_certs
+        target: /certs
+      - type: volume
+        source: caddy_data
+        target: /data
+      - type: volume
+        source: caddy_config
+        target: /config
+      - type: volume
+        source: tailscale_sock
+        target: /var/run/tailscale/ # Mount the volume for /var/run/tailscale/tailscale.sock
+        read_only: true
+    network_mode: service:tailscale
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    environment:
+      TS_SERVE_CONFIG: /serve.json # No Change
+      TS_HOSTNAME: ${TS_HOSTNAME} # Enter the hostname for your tailnet
+      TS_AUTH_KEY: ${TS_AUTH_KEY} # OAuth client key recommended
+      TS_EXTRA_ARGS: ${TS_EXTRA_ARGS} # Tags are required when using OAuth client
+    init: true
+    restart: unless-stopped
+    volumes:
+      - /dev/net/tun:/dev/net/tun
+      - type: volume
+        source: tailscale
+        target: /var/lib/tailscale
+      - type: volume
+        source: tailscale_sock
+        target: /tmp # Mounting the entire /tmp folder to access tailscale.sock
+      - type: bind
+        source: ./serve.json # Use inline binding instead of `configs`
+        target: /serve.json
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    networks:
+      - nextcloud-aio
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer # This line cannot be changed.
+  caddy_certs:
+    name: caddy_certs
+  caddy_data:
+    name: caddy_data
+  caddy_config:
+    name: caddy_config
+  tailscale:
+    name: tailscale
+  tailscale_sock:
+    name: tailscale_sock
+networks:
+  nextcloud-aio:
+    name: nextcloud-aio
+    driver: bridge
+    enable_ipv6: false
+    driver_opts:
+      com.docker.network.driver.mtu: "9001" # Jumbo Frame
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1" # Harden aio

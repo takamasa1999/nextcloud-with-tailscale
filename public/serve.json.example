@@ -1,0 +1,14 @@
+{
+  "TCP": {
+    "80": {
+      "TCPForward": "127.0.0.1:80"
+    },
+    "443": {
+      "TCPForward": "127.0.0.1:443"
+    }
+  },
+  "AllowFunnel": {
+    "next-cloud.your-tailnet-name.ts.net:80": true,
+    "next-cloud.your-tailnet-name.ts.net:443": true
+  }
+}

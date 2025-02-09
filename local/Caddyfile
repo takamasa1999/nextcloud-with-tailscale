@@ -1,0 +1,3 @@
+https://{$NC_DOMAIN}:443 {
+    reverse_proxy nextcloud-aio-apache:11000
+}
