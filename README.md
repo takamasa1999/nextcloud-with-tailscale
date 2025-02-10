@@ -11,6 +11,19 @@ Runs only within your Tailscale network.
 Runs on internet so that you can share with anybody without inviting them to your Tailscale network.
 [Found the seed of this solution here](https://github.com/nextcloud/all-in-one/discussions/5439#discussioncomment-11696448)
 
+## public-hostscale (preferred)
+This is intended to work on a server on which Tailscale is properly installed and set for the funnel as follows.
+
+Forward access from the Tailscale network port 443 to the local port 11000 where `nextcloud-aio-apache` is running.
+```bash
+sudo tailscale funnel --bg --https=443 11000
+```
+
+Forward access from the Tailscale network port 10000 to the local port 10000 where `nextcloud-aio-talk` is running.
+I'm not sure yet if this setting is really necessary on the Tailscale network. Under testing.
+```bash
+sudo tailscale funnel --bg --https=10000 10000
+```
 ## Useful snippets
 ### Delete existing docker containers and networks.
 
