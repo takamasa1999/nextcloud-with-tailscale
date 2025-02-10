@@ -19,11 +19,8 @@ Forward access from the Tailscale network port 443 to the local port 11000 where
 sudo tailscale funnel --bg --https=443 11000
 ```
 
-Forward access from the Tailscale network port 10000 to the local port 10000 where `nextcloud-aio-talk` is running.
-I'm not sure yet if this setting is really necessary on the Tailscale network. Under testing.
-```bash
-sudo tailscale funnel --bg --https=10000 10000
-```
+Apply forward setting on your router and firewall.
+
 ## Useful snippets
 ### Delete existing docker containers and networks.
 
@@ -33,3 +30,4 @@ docker stop $(docker ps -aq);\
 docker rm $(docker ps -aq);\
 docker network rm nextcloud-aio
 ```
+*To re-initiate this app you have to delete the data dir and volumes of `nextcloud-aio-mastercontainer` after the command above.
