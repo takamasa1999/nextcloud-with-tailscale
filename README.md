@@ -1,26 +1,37 @@
 # Nextcloud All-in-One with Tailscale 
-This repository is made to save the best setting that I run [Nextcloud All-in-One](https://github.com/nextcloud/all-in-one) with  [Tailscale](https://github.com/tailscale/tailscale) on my home server.  
-This project is primarily made for myself. If this accidentally helps you somehow, that's more than a pleasure.
+This repository stores the optimal configuration for running [Nextcloud All-in-One](https://github.com/nextcloud/all-in-one) with Tailscale[Tailscale](https://github.com/tailscale/tailscale) on my home server.
+Built for myself. If it helps you, even better.
 
+- [Variants](#variants)
+  - [local](#local)
+  - [public](#public)
+  - [public-hostscale (preferred)](#public-hostscale-preferred)
+- [Tips](#tips)
+  - [Delete existing docker containers and networks.](#delete-existing-docker-containers-and-networks)
+  - [Boot configuration](#boot-configuration)
+  - [Maintenance](#maintenance)
 
-## local
+## Variants
+For various use cases, three variants are provided. Each variant's name aligns with its corresponding directory in this repository.
+
+### local
 This runs only within your Tailscale network.
 [Found the seed of this solution here](https://github.com/nextcloud/all-in-one/discussions/5439#discussioncomment-11935630)
 
-## public
+### public
 This runs on the internet so that you can share with anybody without inviting them on your Tailscale network.
 [Found the seed of this solution here](https://github.com/nextcloud/all-in-one/discussions/5439#discussioncomment-11696448)
 
-## public-hostscale (preferred)
-This is intended to work on a server on which Tailscale is properly installed and set for the funnel option as follows.
+### public-hostscale (preferred)
+This solution is intended for a server with Tailscale pre-installed and its funnel option activated. Essential setup steps include:
 
-- Set up cert for Tailscale so that https connection becomes available
-- Forward access from the tailnet port 443 to the local port 11000 where `nextcloud-aio-apache` is running.
+* **HTTPS Enablement:** Configure Tailscale certificates to facilitate secure HTTPS connections.
+* **Tailscale Funneling:** Direct incoming requests from the Tailscale network's port 443 to the local `nextcloud-aio-apache` instance on port 11000.
     ```bash
     sudo tailscale funnel --bg --https=443 11000
     ```
-- On your router supply static IP for the server then set port forwarding to the one which Nextcloud Talk uses
-- Check your firewall setting is properly set to accept all necessary traffics
+* **Router Port Forwarding:** Set a static IP for the server on your router, then forward the Nextcloud Talk port.
+* **Firewall Adjustment:** Confirm your firewall settings are open for all required network traffic.
 
 
 ## Tips
@@ -34,9 +45,8 @@ docker network rm nextcloud-aio
 ```
 *To initiate this app you have to delete the data dir and volumes of `nextcloud-aio-mastercontainer` after the command above.
 
-### Set up boot options
-- [Create systemd service](https://linuxhandbook.com/create-systemd-services/) to turn off displays at the boot.
-  In my case I registered the command below to the service.
+### Boot configuration
+- [Create systemd service](https://linuxhandbook.com/create-systemd-services/) to turn off built-in displays at the boot.
   ```bash
   sudo vbetool dpms off
   ```
@@ -49,3 +59,8 @@ docker network rm nextcloud-aio
     ```bash
     sudo mount -a
     ```
+
+### Maintenance
+- Update and upgrade apt packages
+- Login to Nextcloud as admin
+- Go to the setting and open Nextcloud AIO Interface
