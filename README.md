@@ -1,6 +1,7 @@
 # Nextcloud All-in-One with Tailscale 
 This repository stores the optimal configuration for running [Nextcloud All-in-One](https://github.com/nextcloud/all-in-one) with Tailscale[Tailscale](https://github.com/tailscale/tailscale) on my home server.
-Built for myself. If it helps you, even better.
+Built for myself. If it helps you, even better.  
+> Currently, only public-hostscale is actively maintained since I use it as my main driver.
 
 - [Variants](#variants)
   - [local](#local)
@@ -32,7 +33,10 @@ This solution is intended for a server with Tailscale pre-installed and its funn
     ```
 * **Router Port Forwarding:** Set a static IP for the server on your router, then forward the Nextcloud Talk port.
 * **Firewall Adjustment:** Confirm your firewall settings are open for all required network traffic.
-
+* **A insecure connection must be established when you are using the AIO containers manager.
+    ```bash
+    sudo tailscale serve --https=8888 https+insecure://127.0.0.1:8080
+    ```
 
 ## Tips
 ### Delete existing docker containers and networks.
@@ -64,3 +68,4 @@ docker network rm nextcloud-aio
 - Update and upgrade apt packages
 - Login to Nextcloud as admin
 - Go to the setting and open Nextcloud AIO Interface
+this are  good.
